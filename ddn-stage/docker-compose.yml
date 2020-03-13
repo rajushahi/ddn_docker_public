@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  ddn-presta_stage:
+    image: prestashop/prestashop:1.7-7.0-apache
+    restart: always
+    expose:
+      - 80
+      - 443
+    volumes:
+      - /data_stage:/var/www/html
+    environment:
+      VIRTUAL_HOST: dev.application.com
+      LETSENCRYPT_HOST: dev.application.com
+      LETSENCRYPT_EMAIL: mail@rajushahi.com
+      PS_DEV_MODE: 0
+      PS_INSTALL_AUTO: 0
+      PS_HOST_MODE: 0
+      PS_DEMO_MODE: 0
+    links:
+      - ddn_db_stage
+    depends_on:
+      - ddn_db_stage
+
+  ddn_db_stage:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: youwish
+      MYSQL_DATABASE: ddn_stage_db
+      MYSQL_USER: ddn_stage
+      MYSQL_PASSWORD: yaright
+    ports:
+      - 3307:3307
+    volumes:
+      - mysql-data-stage:/var/lib/mysql
+      - /mysql:/dump
+
+volumes:
+  mysql-data-stage:
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
